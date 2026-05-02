@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# seed resume checkpoint
+scripts/.seed-progress.json
+
+# Large seed data files (re-download or restore from backup to reseed)
+data/*.csv
+
+# Built CLI bundle (regenerate with: npm run build:cli)
+dist/

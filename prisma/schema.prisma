@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── NBA data ──────────────────────────────────────────────────────────────────
+
+model Player {
+  id             Int               @id  // NBA player ID from dataset
+  name           String
+  ticker         String?           @unique
+  isActive       Boolean           @default(false)  // true if appeared in season 2025
+  currentPrice   Float?
+  priceUpdatedAt DateTime?
+  updatedAt      DateTime          @updatedAt
+  gameLogs       GameLog[]
+  positions      UserPosition[]
+  transactions   UserTransaction[]
+
+  @@map("players")
+}
+
+model GameLog {
+  id         Int      @id @default(autoincrement())
+  playerId   Int
+  player     Player   @relation(fields: [playerId], references: [id])
+  gameId     Int
+  gameDate   DateTime @db.Date
+  season     Int
+  gameType   String   // "regular" | "playoff" | "playin"
+  team       String
+  isHome     Boolean
+  min        Float?
+  pts        Int?
+  fgm        Int?
+  fga        Int?
+  fg3m       Int?
+  fg3a       Int?
+  ftm        Int?
+  fta        Int?
+  oreb       Int?
+  dreb       Int?
+  reb        Int?
+  ast        Int?
+  stl        Int?
+  blk        Int?
+  tov        Int?
+  pf         Int?
+  plusMinus  Float?
+  win        Boolean?
+  stockPrice Float?   // pts + reb*1.2 + ast*1.5 + stl*3 + blk*3 - tov*1
+
+  @@unique([playerId, gameId])
+  @@index([playerId, gameDate])
+  @@index([playerId, season])
+  @@index([season])
+  @@map("game_logs")
+}
+
+// ── Auth.js tables ────────────────────────────────────────────────────────────
+
+model User {
+  id            String            @id @default(cuid())
+  name          String?
+  email         String            @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  balance       Float             @default(100000)  // Starting balance ($100k)
+  createdAt     DateTime          @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  positions     UserPosition[]
+  transactions  UserTransaction[]
+
+  @@map("users")
+}
+
+model UserPosition {
+  id          String   @id @default(cuid())
+  userId      String
+  playerId    Int
+  shares      Float
+  avgBuyPrice Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  player      Player   @relation(fields: [playerId], references: [id])
+
+  @@unique([userId, playerId])
+  @@map("user_positions")
+}
+
+model UserTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  playerId  Int
+  type      String   // "buy" | "sell"
+  shares    Float
+  price     Float
+  total     Float
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  player    Player   @relation(fields: [playerId], references: [id])
+
+  @@index([userId])
+  @@map("user_transactions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
