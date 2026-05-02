@@ -1,12 +1,15 @@
 {
-  "name": "nba-stocks",
+  "name": "nbastocks",
   "version": "0.1.0",
-  "private": true,
+  "bin": {
+    "nbastocks": "dist/cli.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "prepare": "npm run build:cli",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
@@ -15,7 +18,7 @@
     "db:price": "tsx scripts/price-players.ts",
     "db:tickers": "tsx scripts/generate-tickers.ts",
     "cli": "tsx scripts/terminal.ts",
-    "build:cli": "esbuild scripts/terminal.ts --bundle --platform=node --outfile=dist/cli.js --external:@prisma/client"
+    "build:cli": "esbuild scripts/terminal.ts --bundle --platform=node --outfile=dist/cli.js --external:@prisma/client --banner:js='#!/usr/bin/env node'"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

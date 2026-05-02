@@ -1,0 +1,37 @@
+# Next.js app
+app/
+public/
+
+# Source (dist/ is the built output we want)
+scripts/
+lib/
+auth.ts
+middleware.ts
+prisma.config.ts
+
+# Database
+prisma/
+data/
+
+# Config
+vercel.json
+next.config.ts
+tailwind.config.*
+postcss.config.*
+tsconfig.json
+eslint.config.*
+
+# Build artifacts (not the CLI bundle)
+.next/
+out/
+coverage/
+
+# Dev / secrets
+.env*
+*.pem
+
+# Leaked files
+.claude/
+next-env.d.ts
+*.tsbuildinfo
+README.md

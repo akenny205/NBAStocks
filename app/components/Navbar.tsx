@@ -31,6 +31,9 @@ export async function Navbar() {
         <a href="/transactions" className="text-sm text-zinc-400 hover:text-white transition-colors">
           History
         </a>
+        <a href="/terminal" className="text-sm text-zinc-400 hover:text-white transition-colors">
+          Terminal
+        </a>
       </div>
 
       <Link
