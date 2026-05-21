@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { CompareChart, type PlayerSeries } from "@/app/components/CompareChart";
 import { BuyDialog } from "@/app/components/BuyDialog";
+import { PlayerAvatar } from "@/app/components/PlayerAvatar";
 import { fmt } from "@/lib/format";
 import { COLORS } from "@/lib/constants";
 
@@ -230,10 +231,15 @@ export function PlayersClient() {
                     onClick={() => togglePlayer(player)}
                     className="flex-1 flex items-center gap-3 text-left min-w-0"
                   >
-                    <span
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-zinc-600 transition-colors"
-                      style={sel ? { background: color!, borderColor: color! } : {}}
-                    />
+                    <div className="relative flex-shrink-0">
+                      <PlayerAvatar playerId={player.id} playerName={player.name} size="sm" />
+                      {sel && (
+                        <span
+                          className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-zinc-900"
+                          style={{ background: color! }}
+                        />
+                      )}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-sm text-white font-medium truncate">{player.name}</div>
                       <div className="text-xs text-zinc-500 mt-0.5 flex items-center gap-1.5">
@@ -301,14 +307,17 @@ function TopPlayers({
                 sel ? "border-orange-500/40 bg-orange-500/5" : "border-zinc-800/60 bg-zinc-900 hover:border-zinc-700"
               }`}
             >
-              <button onClick={() => onSelect(player)} className="flex-1 text-left min-w-0">
-                <div className="text-sm font-semibold text-white truncate">{player.name}</div>
-                <div className="text-xs text-zinc-500 mt-0.5 flex items-center gap-1.5">
-                  {player.team && <span>{player.team}</span>}
-                  {player.stats && <span>· {player.stats.ppg} PPG</span>}
-                  <span className={player.isActive ? "text-green-500" : "text-zinc-600"}>
-                    · {player.isActive ? "Active" : "Retired"}
-                  </span>
+              <button onClick={() => onSelect(player)} className="flex-1 flex items-center gap-3 text-left min-w-0">
+                <PlayerAvatar playerId={player.id} playerName={player.name} size="md" />
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white truncate">{player.name}</div>
+                  <div className="text-xs text-zinc-500 mt-0.5 flex items-center gap-1.5">
+                    {player.team && <span>{player.team}</span>}
+                    {player.stats && <span>· {player.stats.ppg} PPG</span>}
+                    <span className={player.isActive ? "text-green-500" : "text-zinc-600"}>
+                      · {player.isActive ? "Active" : "Retired"}
+                    </span>
+                  </div>
                 </div>
               </button>
               <div className="flex items-center gap-3 flex-shrink-0 ml-3">

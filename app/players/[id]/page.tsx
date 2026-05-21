@@ -7,6 +7,7 @@ import { PlayerChart } from "@/app/components/PlayerChart";
 import { BuyDialog } from "@/app/components/BuyDialog";
 import { fmt } from "@/lib/format";
 import { TrendAnalysis } from "@/app/components/TrendAnalysis";
+import { PlayerAvatar } from "@/app/components/PlayerAvatar";
 
 async function getPlayerWithLogs(id: number) {
   const player = await db.player.findUnique({
@@ -121,7 +122,8 @@ export default async function PlayerPage({
 
       <main className="max-w-5xl mx-auto px-6 py-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-4 mb-6">
+          <PlayerAvatar playerId={player.id} playerName={player.name} size="lg" />
           <h1 className="text-2xl font-bold text-white">{player.name}</h1>
           <span
             className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${

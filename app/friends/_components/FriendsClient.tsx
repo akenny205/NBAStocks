@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { fmt } from "@/lib/format";
+import { PlayerAvatar } from "@/app/components/PlayerAvatar";
 
 type Friend = {
   friendshipId: string;
@@ -353,10 +354,13 @@ export function FriendsClient() {
                         isUp ? "border-l-green-500" : "border-l-red-500"
                       }`}
                     >
-                      <Link href={`/players/${pos.player.id}`} className="flex-1 min-w-0 pl-4">
-                        <div className="text-sm font-semibold text-white truncate">{pos.player.name}</div>
-                        <div className="text-xs text-zinc-500 mt-0.5">
-                          {fmt(pos.shares)} sh · <span className="text-zinc-400">${fmt(pos.currentPrice)}</span>
+                      <Link href={`/players/${pos.player.id}`} className="flex-1 min-w-0 pl-3 flex items-center gap-3">
+                        <PlayerAvatar playerId={pos.player.id} playerName={pos.player.name} size="sm" />
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-white truncate">{pos.player.name}</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">
+                            {fmt(pos.shares)} sh · <span className="text-zinc-400">${fmt(pos.currentPrice)}</span>
+                          </div>
                         </div>
                       </Link>
                       <div className="text-right flex-shrink-0">
