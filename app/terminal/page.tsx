@@ -6,18 +6,9 @@ export const metadata = {
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <code className="block bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-orange-400 font-mono whitespace-pre">
+    <code className="block bg-zinc-950 border border-zinc-800/60 rounded-lg px-4 py-3 text-sm text-orange-400 font-mono whitespace-pre">
       {children}
     </code>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-10">
-      <h2 className="text-lg font-semibold text-white mb-4">{title}</h2>
-      {children}
-    </div>
   );
 }
 
@@ -38,73 +29,97 @@ const commands = [
 
 export default function TerminalPage() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-zinc-950">
       <Navbar />
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-6 py-8">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-white">Terminal</h1>
-          <p className="text-zinc-500 text-sm mt-2">
+          <h1 className="text-2xl font-bold text-white">Terminal Exchange</h1>
+          <p className="text-zinc-500 text-sm mt-1">
             Trade NBAStocks directly from your terminal using the official CLI.
           </p>
         </div>
 
-        <Section title="Requirements">
-          <p className="text-zinc-400 text-sm mb-3">
-            Node.js v18 or later. No installation required — run it directly with <code className="text-orange-400 font-mono">npx</code>.
-          </p>
-          <p className="text-zinc-400 text-sm">
-            Check your Node.js version:
-          </p>
-          <div className="mt-2">
-            <CodeBlock>node --version</CodeBlock>
-          </div>
-        </Section>
-
-        <Section title="Usage">
-          <p className="text-zinc-400 text-sm mb-3">
-            Run the CLI and point it at the exchange:
-          </p>
-          <CodeBlock>npx nbastocks https://nbastocks.vercel.app</CodeBlock>
-          <p className="text-zinc-400 text-sm mt-4 mb-3">
-            You'll be prompted to log in with your NBAStocks email and password. Your session is saved locally so you won't need to log in every time.
-          </p>
-          <p className="text-zinc-400 text-sm mb-2">
-            To connect to a local dev server:
-          </p>
-          <CodeBlock>npx nbastocks http://localhost:3000</CodeBlock>
-        </Section>
-
-        <Section title="Commands">
-          <div className="border border-zinc-800 rounded-lg overflow-hidden">
-            {commands.map((c, i) => (
-              <div
-                key={i}
-                className={`flex gap-4 px-4 py-3 text-sm ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-900/40"}`}
-              >
-                <code className="text-orange-400 font-mono w-56 shrink-0">{c.cmd}</code>
-                <span className="text-zinc-400">{c.desc}</span>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Main content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Getting started */}
+            <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl p-6">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">Getting Started</h2>
+              <p className="text-zinc-400 text-sm mb-4">
+                No installation required — run it directly with{" "}
+                <code className="text-orange-400 font-mono text-xs bg-zinc-800 px-1.5 py-0.5 rounded">npx</code>.
+                Requires Node.js v18 or later.
+              </p>
+              <div className="space-y-3">
+                <CodeBlock>npx nbastocks https://nbastocks.vercel.app</CodeBlock>
+                <p className="text-zinc-500 text-xs">or connect to a local dev server:</p>
+                <CodeBlock>npx nbastocks http://localhost:3000</CodeBlock>
               </div>
-            ))}
-          </div>
-        </Section>
+              <p className="text-zinc-500 text-sm mt-4">
+                You'll be prompted to log in with your NBAStocks email and password. Your session is saved locally so you won't need to re-authenticate each time.
+              </p>
+            </div>
 
-        <Section title="Limitations">
-          <ul className="space-y-2 text-sm text-zinc-400 list-disc list-inside">
-            <li>
-              The <code className="text-orange-400 font-mono">TICKERS</code> command requires a local copy of the repo — it reads from a local file that isn't included with the npx package.
-            </li>
-            <li>
-              Limit orders are only available in debug mode (<code className="text-orange-400 font-mono">DEBUG ON</code>) and are intended for testing.
-            </li>
-            <li>
-              Password input requires a proper terminal. Some embedded shells (VS Code terminal, certain IDEs) may not hide characters correctly.
-            </li>
-            <li>
-              Sessions are stored locally per machine and per server URL. Logging in on one machine does not log you in elsewhere.
-            </li>
-          </ul>
-        </Section>
+            {/* Commands */}
+            <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-zinc-800/60">
+                <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Commands</h2>
+              </div>
+              <div className="divide-y divide-zinc-800/40">
+                {commands.map((c, i) => (
+                  <div key={i} className="flex gap-4 px-6 py-3 text-sm hover:bg-zinc-800/20 transition-colors">
+                    <code className="text-orange-400 font-mono w-56 shrink-0 text-xs">{c.cmd}</code>
+                    <span className="text-zinc-400 text-xs">{c.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl p-5">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Requirements</h2>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                  Node.js v18+
+                </div>
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                  NBAStocks account
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-xs text-zinc-600 mb-2">Check your version:</p>
+                <CodeBlock>node --version</CodeBlock>
+              </div>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl p-5">
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Limitations</h2>
+              <ul className="space-y-2.5 text-xs text-zinc-500">
+                <li className="flex gap-2">
+                  <span className="text-zinc-600 flex-shrink-0">·</span>
+                  <span><code className="text-orange-400 font-mono">TICKERS</code> requires a local repo clone — reads from a local file not included with the npx package.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-zinc-600 flex-shrink-0">·</span>
+                  <span>Limit orders only work in <code className="text-orange-400 font-mono">DEBUG ON</code> mode and are for testing only.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-zinc-600 flex-shrink-0">·</span>
+                  <span>Password input requires a real terminal — some embedded shells may not hide characters.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-zinc-600 flex-shrink-0">·</span>
+                  <span>Sessions are per-machine and per-server URL.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

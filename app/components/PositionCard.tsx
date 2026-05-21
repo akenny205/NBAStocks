@@ -21,42 +21,36 @@ export function PositionCard({ position }: { position: Position }) {
   const isUp = gainLoss >= 0;
   const router = useRouter();
 
-  function handleSellSuccess() {
-    router.refresh();
-  }
-
   return (
-    <div className="flex items-center justify-between py-4 border-b border-zinc-900 last:border-0 hover:bg-zinc-900/40 -mx-4 px-4 rounded-lg transition-colors">
-      <Link href={`/players/${player.id}`} className="flex-1 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-lg flex-shrink-0">
-          🏀
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-white">{player.name}</div>
-          <div className="text-xs text-zinc-500 mt-0.5">
-            {fmt(shares)} shares · {player.isActive ? "Active" : "Retired"}
-          </div>
+    <div className={`flex items-center gap-3 pl-0 pr-4 py-3 hover:bg-zinc-900/60 transition-colors border-l-2 ${
+      isUp ? "border-l-green-500" : "border-l-red-500"
+    }`}>
+      <Link href={`/players/${player.id}`} className="flex-1 min-w-0 pl-4">
+        <div className="text-sm font-semibold text-white truncate">{player.name}</div>
+        <div className="text-xs text-zinc-500 mt-0.5">
+          {fmt(shares)} sh · <span className="text-zinc-400">${fmt(currentPrice)}</span>
         </div>
       </Link>
 
-      <div className="text-right mr-4 flex-1">
-        <div className="text-sm font-semibold text-white">${fmt(currentValue)}</div>
-        <div className={`text-xs mt-0.5 font-medium ${isUp ? "text-green-400" : "text-orange-400"}`}>
-          {isUp ? "+" : ""}${fmt(gainLoss)} ({isUp ? "+" : ""}{gainLossPct.toFixed(2)}%)
-        </div>
-        <div className="text-xs text-zinc-600 mt-0.5">${fmt(currentPrice)}/pt</div>
+      <div className="text-right flex-shrink-0">
+        <div className="text-sm font-bold text-white tabular-nums">${fmt(currentValue)}</div>
+        <span className={`inline-block text-xs font-bold tabular-nums px-1.5 py-0.5 rounded mt-0.5 ${
+          isUp
+            ? "bg-green-500/15 text-green-400"
+            : "bg-red-500/15 text-red-400"
+        }`}>
+          {isUp ? "+" : ""}{gainLossPct.toFixed(2)}%
+        </span>
       </div>
 
-      <div className="flex gap-2">
-        <SellDialog
-          positionId={position.id}
-          playerName={player.name}
-          shares={shares}
-          currentPrice={currentPrice}
-          avgBuyPrice={position.avgBuyPrice}
-          onSuccess={handleSellSuccess}
-        />
-      </div>
+      <SellDialog
+        positionId={position.id}
+        playerName={player.name}
+        shares={shares}
+        currentPrice={currentPrice}
+        avgBuyPrice={position.avgBuyPrice}
+        onSuccess={() => router.refresh()}
+      />
     </div>
   );
 }

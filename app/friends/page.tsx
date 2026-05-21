@@ -1,11 +1,11 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Navbar } from "@/app/components/Navbar";
-import { TransactionHistory } from "@/app/components/TransactionHistory";
+import { FriendsClient } from "./_components/FriendsClient";
 
-export const metadata = { title: "History | NBAStocks" };
+export const metadata = { title: "Friends | NBAStocks" };
 
-export default async function TransactionsPage() {
+export default async function FriendsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
@@ -14,10 +14,10 @@ export default async function TransactionsPage() {
       <Navbar />
       <main className="max-w-5xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Transaction History</h1>
-          <p className="text-zinc-500 text-sm mt-1">All your buy and sell activity</p>
+          <h1 className="text-2xl font-bold text-white">Friends</h1>
+          <p className="text-zinc-500 text-sm mt-1">See where your friends have their money</p>
         </div>
-        <TransactionHistory />
+        <FriendsClient />
       </main>
     </div>
   );

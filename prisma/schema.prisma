@@ -75,8 +75,24 @@ model User {
   sessions      Session[]
   positions     UserPosition[]
   transactions  UserTransaction[]
+  sentFriendRequests     Friendship[] @relation("FriendshipRequester")
+  receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
 
   @@map("users")
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  addresseeId String
+  status      String   @default("pending") // "pending" | "accepted"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  requester   User     @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee   User     @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@map("friendships")
 }
 
 model UserPosition {

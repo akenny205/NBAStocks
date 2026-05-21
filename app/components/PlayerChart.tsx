@@ -5,7 +5,11 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import { fmt } from "@/lib/format";
+import { RANGE_DAYS } from "@/lib/constants";
+import { getTicks, formatFullDate, formatTickDate } from "@/lib/charts";
 import { rollingAvg, SMOOTH_WINDOW } from "@/lib/smooth";
+import { ChartTooltip } from "@/app/components/charts/ChartTooltip";
+import { ChartEmptyState } from "@/app/components/charts/ChartEmptyState";
 
 export type GamePoint = {
   date: string;
@@ -23,8 +27,12 @@ export type GamePoint = {
 const RANGES = ["1M", "3M", "1Y", "3Y", "ALL"] as const;
 type Range = (typeof RANGES)[number];
 
-const RANGE_DAYS: Record<Exclude<Range, "ALL">, number> = {
-  "1M": 30, "3M": 90, "1Y": 365, "3Y": 1095,
+const TICK_INTERVAL_DAYS: Record<Range, number> = {
+  "1M": 7,
+  "3M": 30,
+  "1Y": 60,
+  "3Y": 180,
+  "ALL": 365,
 };
 
 function filterByRange(data: GamePoint[], range: Range): GamePoint[] {
@@ -34,12 +42,6 @@ function filterByRange(data: GamePoint[], range: Range): GamePoint[] {
   const cutoffStr = cutoff.toISOString().split("T")[0];
   const filtered = data.filter((d) => d.date >= cutoffStr);
   return filtered.length > 1 ? filtered : data.slice(-10);
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-  });
 }
 
 type ChartPoint = GamePoint & { smoothed: number | null };
@@ -54,12 +56,14 @@ export function PlayerChart({ data, currentPrice }: Props) {
   const [range, setRange] = useState<Range>("1Y");
   const [hovered, setHovered] = useState<ChartPoint | null>(null);
 
-  // Filter then smooth — window scales with range so zoomed-out views are cleaner
   const chartPoints = useMemo<ChartPoint[]>(() => {
     const filtered = filterByRange(data, range);
     const smoothed = rollingAvg(filtered.map((d) => d.stockPrice), SMOOTH_WINDOW[range]);
     return filtered.map((d, i) => ({ ...d, smoothed: smoothed[i] }));
   }, [data, range]);
+
+  const showYear = range === "1Y" || range === "3Y" || range === "ALL";
+  const ticks = getTicks(chartPoints, TICK_INTERVAL_DAYS[range]);
 
   const startPrice = chartPoints[0]?.smoothed ?? chartPoints[0]?.stockPrice ?? currentPrice;
   const displayPrice = hovered?.smoothed ?? currentPrice;
@@ -90,14 +94,14 @@ export function PlayerChart({ data, currentPrice }: Props) {
           {displayChange >= 0 ? "+" : ""}${fmt(displayChange)}{" "}
           ({displayChangePct >= 0 ? "+" : ""}{displayChangePct.toFixed(2)}%)
           {hovered ? (
-            <span className="text-zinc-500 font-normal ml-2">{formatDate(hovered.date)}</span>
+            <span className="text-zinc-500 font-normal ml-2">{formatFullDate(hovered.date)}</span>
           ) : (
             <span className="text-zinc-500 font-normal ml-2">vs. start of range</span>
           )}
         </div>
       </div>
 
-      {/* Hovered game stats — shows raw game stats even though chart is smoothed */}
+      {/* Hovered game stats */}
       <div className="h-8 mb-4">
         {hovered && (
           <div className="flex gap-4 text-xs text-zinc-500">
@@ -121,19 +125,30 @@ export function PlayerChart({ data, currentPrice }: Props) {
       {chartPoints.length > 1 ? (
         <div className="h-56 -mx-1">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartPoints} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+            <AreaChart data={chartPoints} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} margin={{ bottom: 4 }}>
               <defs>
                 <linearGradient id="playerGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={color} stopOpacity={0.2} />
                   <stop offset="100%" stopColor={color} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" hide />
+              <XAxis
+                dataKey="date"
+                ticks={ticks}
+                tickFormatter={(v) => formatTickDate(v, showYear)}
+                tick={{ fill: "#52525b", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
               <YAxis hide domain={["auto", "auto"]} />
-              <Tooltip content={() => null} />
+              <Tooltip
+                content={<ChartTooltip getValue={(p) => p.smoothed ?? p.stockPrice} />}
+                cursor={{ stroke: "#52525b", strokeWidth: 1, strokeDasharray: "4 4" }}
+              />
               <ReferenceLine y={avg} stroke="#3f3f46" strokeDasharray="4 4" />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="smoothed"
                 stroke={color}
                 strokeWidth={2}
@@ -148,9 +163,7 @@ export function PlayerChart({ data, currentPrice }: Props) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="h-56 flex items-center justify-center text-zinc-600 text-sm">
-          Not enough data for this range
-        </div>
+        <ChartEmptyState message="No game activity recorded in the selected period." />
       )}
 
       {/* Range + avg */}

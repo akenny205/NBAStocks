@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Legend,
 } from "recharts";
 import { fmt } from "@/lib/format";
+import { COLORS } from "@/lib/constants";
 import { rollingAvg, SMOOTH_WINDOW } from "@/lib/smooth";
 
 export type PlayerSeries = {
@@ -13,18 +14,6 @@ export type PlayerSeries = {
   currentPrice: number | null;
   series: { date: string; price: number | null; gameType: string }[];
 };
-
-// Distinct colors for up to 8 players
-const COLORS = [
-  "#f97316", // orange
-  "#22c55e", // green
-  "#3b82f6", // blue
-  "#a855f7", // purple
-  "#ec4899", // pink
-  "#eab308", // yellow
-  "#14b8a6", // teal
-  "#f43f5e", // rose
-];
 
 type Props = {
   players: PlayerSeries[];
